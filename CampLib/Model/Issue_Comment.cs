@@ -2,25 +2,25 @@ namespace KlasseLib;
 
 public class Issue_Comment
 {
-    public int Id { get; set; }
+    public int id { get; set; }
     public string Text { get; set; }
     DateTime createdAt;
-    public int IssueID { get; set; }
-    public int CreatedByUserID { get; set; }
+    public int Issueid { get; set; }
+    public int CreatedByUserid { get; set; }
 
     public Issue_Comment(DateTime createdAt, int id, string text, int issueId, int createdByUserId)
     {
         this.createdAt = createdAt;
-        Id = id;
+        id = id;
         Text = text;
-        IssueID = issueId;
-        CreatedByUserID = createdByUserId;
+        Issueid = issueId;
+        CreatedByUserid = createdByUserId;
     }
 
 
     public override string ToString()
     {
         return
-            $"{nameof(createdAt)}: {createdAt}, {nameof(Id)}: {Id}, {nameof(Text)}: {Text}, {nameof(IssueID)}: {IssueID}, {nameof(CreatedByUserID)}: {CreatedByUserID}";
+            $"{nameof(createdAt)}: {createdAt}, {nameof(id)}: {id}, {nameof(Text)}: {Text}, {nameof(Issueid)}: {Issueid}, {nameof(CreatedByUserid)}: {CreatedByUserid}";
     }
 }
