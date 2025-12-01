@@ -1,0 +1,6 @@
+@CampWebService_HostAddress = http://localhost:5177
+
+GET {{CampWebService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
