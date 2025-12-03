@@ -1,5 +1,5 @@
 namespace KlasseLib;
-a
+
 public class User_Role
 {
     public int UserId { get; set; }
