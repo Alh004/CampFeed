@@ -11,14 +11,14 @@ namespace CampLib.Model
 
         // Instansfelter
         private int _id;
-        private string _name;
+       
         private string _email;
-        private string _password;
-        private string _phone;
+     
+       
 
         // property
         public int Id { get; set; }
-        public string Name { get; set; }
+       
         public string Email
         {
             get => _email;
@@ -30,23 +30,21 @@ namespace CampLib.Model
                 _email = value;
             }
         }
-        public string Password { get; set; }
-        public bool IsActive { get; set; }
+       
+       
 
         // Constructor
-        public User(int id, string name, string email, string password, bool isActive)
+        public User(int id, string email)
         {
             Id = id;
-            Name = name;
             Email = email;
-            Password = password;
-            IsActive = isActive;
+
         }
 
         // ToString
         public override string ToString()
         {
-            return $"Id: {Id}, Name: {Name}, Email: {Email}, IsActive: {IsActive}";
+            return $"Id: {Id}, Email: {Email}";
         }
 
     }

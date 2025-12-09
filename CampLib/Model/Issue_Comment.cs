@@ -4,7 +4,7 @@ public class Issue_Comment
 {
     public int id { get; set; }
     public string Text { get; set; }
-    DateTime createdAt;
+    public DateTime createdAt;
     public int Issueid { get; set; }
     public int CreatedByUserid { get; set; }
 
