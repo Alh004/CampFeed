@@ -1,25 +1,25 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using KlasseLib; // Room + AppDbContext
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+    using KlasseLib; // Room + AppDbContext
 
-namespace StudyFeedback.Web.Controllers;
+    namespace StudyFeedback.Web.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class RoomsController : ControllerBase
-{
-    private readonly AppDbContext _context;
-
-    public RoomsController(AppDbContext context)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class RoomsController : ControllerBase
     {
-        _context = context;
-    }
+        private readonly AppDbContext _context;
 
-    // GET: api/rooms
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Room>>> GetRooms()
-    {
-        var rooms = await _context.Rooms.ToListAsync();
-        return Ok(rooms);
+        public RoomsController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        // GET: api/rooms
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Room>>> GetRooms()
+        {
+            var rooms = await _context.Rooms.ToListAsync();
+            return Ok(rooms);
+        }
     }
-}

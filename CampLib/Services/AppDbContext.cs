@@ -9,7 +9,7 @@ namespace KlasseLib
             : base(options)
         {
         }
-
+ 
         // Tabeller (DbSet) – start bare med de tre vigtigste
         public DbSet<Room> Rooms { get; set; } = null!;
         public DbSet<Issue> Issues { get; set; } = null!;
