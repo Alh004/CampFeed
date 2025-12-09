@@ -1,3 +1,4 @@
+using CampLib.Repository;
 using Microsoft.EntityFrameworkCore;
 using KlasseLib;
 using WebApplication1;
@@ -18,6 +19,12 @@ builder.Services.AddSingleton<CloudinaryService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Repositories
+builder.Services.AddScoped<IssueRepository>();
+builder.Services.AddScoped<CategoryRepository>();
+builder.Services.AddScoped<IssueCommentRepository>();
+builder.Services.AddScoped<UserRepository>();
 
 //Cors
 builder.Services.AddCors(options =>
