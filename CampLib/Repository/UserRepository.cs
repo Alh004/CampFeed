@@ -1,122 +1,55 @@
 using CampLib.Model;
-using Microsoft.Data.SqlClient;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-public class UserRepository
+namespace CampLib.Repository
 {
-    private readonly string _connectionString =
-        "Server=mssql7.unoeuro.com,1433;" +
-        "Database=kunforhustlers_dk_db_campfeed;" +
-        "User Id=kunforhustlers_dk;" +
-        "Password=RmcAfptngeBaxkw6zr5E;" +
-        "Encrypt=False;";
-
-    // Hent alle edu.zealand.dk-brugere
-    public async Task<List<User>> GetAllAsync()
+    public class UserRepository
     {
-        var users = new List<User>();
+        private static readonly List<User> _users = new();
+        private static int _nextId = 1;
 
-        string sql = @"
-            SELECT Id, Email
-            FROM dbo.[User]
-            WHERE Email LIKE '%@edu.zealand.dk'
-            ORDER BY Email";
-
-        await using var db = new SqlConnection(_connectionString);
-        await db.OpenAsync();
-
-        await using var cmd = new SqlCommand(sql, db);
-        await using var reader = await cmd.ExecuteReaderAsync();
-
-        while (await reader.ReadAsync())
+        public Task<List<User>> GetAllAsync()
         {
-            int id = reader.GetInt32(reader.GetOrdinal("Id"));
-            string email = reader.GetString(reader.GetOrdinal("Email"));
-
-            try
-            {
-                users.Add(new User(id, email));
-            }
-            catch
-            {
-                // Spring over emails som ikke matcher @edu.zealand.dk
-            }
+            return Task.FromResult(_users);
         }
 
-        return users;
-    }
-
-    // Hent bruger på Id
-    public async Task<User?> GetByIdAsync(int id)
-    {
-        User? user = null;
-
-        string sql = @"
-            SELECT Id, Email
-            FROM dbo.[User]
-            WHERE Id = @Id";
-
-        await using var db = new SqlConnection(_connectionString);
-        await db.OpenAsync();
-
-        await using var cmd = new SqlCommand(sql, db);
-        cmd.Parameters.AddWithValue("@Id", id);
-
-        await using var reader = await cmd.ExecuteReaderAsync();
-        if (await reader.ReadAsync())
+        public Task<User?> GetByIdAsync(int id)
         {
-            int userId = reader.GetInt32(reader.GetOrdinal("Id"));
-            string email = reader.GetString(reader.GetOrdinal("Email"));
-
-            try
-            {
-                user = new User(userId, email);
-            }
-            catch
-            {
-                user = null; // Email matcher ikke @edu.zealand.dk
-            }
+            return Task.FromResult(_users.FirstOrDefault(u => u.Id == id));
         }
 
-        return user;
+        public Task<User> AddAsync(User user)
+        {
+            if (!user.Email.EndsWith("@edu.zealand.dk"))
+                throw new ArgumentException("Email skal ende på @edu.zealand.dk");
+
+            user.Id = _nextId++;
+            _users.Add(user);
+            return Task.FromResult(user);
+        }
+
+        public Task<User?> UpdateAsync(int id, User updated)
+        {
+            var user = _users.FirstOrDefault(u => u.Id == id);
+            if (user == null) return Task.FromResult<User?>(null);
+
+            if (!updated.Email.EndsWith("@edu.zealand.dk"))
+                throw new ArgumentException("Email skal ende på @edu.zealand.dk");
+
+            user.Email = updated.Email;
+
+            return Task.FromResult(user);
+        }
+
+        public Task<bool> DeleteAsync(int id)
+        {
+            var user = _users.FirstOrDefault(u => u.Id == id);
+            if (user == null) return Task.FromResult(false);
+
+            _users.Remove(user);
+            return Task.FromResult(true);
+        }
     }
-
-    // AddAsync
-    public async Task<User> AddAsync(User user)
-    {
-        string sql = @"
-            INSERT INTO dbo.[User] (Email)
-            OUTPUT INSERTED.Id
-            VALUES (@Email)";
-
-        await using var db = new SqlConnection(_connectionString);
-        await db.OpenAsync();
-
-        await using var cmd = new SqlCommand(sql, db);
-        cmd.Parameters.AddWithValue("@Email", user.Email);
-
-        var insertedId = (int)await cmd.ExecuteScalarAsync();
-        user.Id = insertedId;
-
-        return user;
-    }
-
-    // UpdateAsync
-    public async Task<User?> UpdateAsync(int id, User user)
-    {
-        string sql = @"
-            UPDATE dbo.[User]
-            SET Email = @Email
-            WHERE Id = @Id";
-
-        await using var db = new SqlConnection(_connectionString);
-        await db.OpenAsync();
-
-        await using var cmd = new SqlCommand(sql, db);
-        cmd.Parameters.AddWithValue("@Id", id);
-        cmd.Parameters.AddWithValue("@Email", user.Email);
-
-        var rows = await cmd.ExecuteNonQueryAsync();
-        return rows > 0 ? user : null;
-    }
-    
 }

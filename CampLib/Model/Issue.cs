@@ -55,6 +55,8 @@ namespace KlasseLib
         // 🔥 Reporter (den studerende der opretter issue)
         public int ReporterUserId { get; set; }
         public User? Reporter { get; set; }
+        
+        
 
         // 🔥 Assigned-to (tekniker)
         public int? AssignedToUserId { get; set; }

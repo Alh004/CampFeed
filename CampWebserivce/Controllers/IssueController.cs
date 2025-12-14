@@ -1,72 +1,95 @@
-﻿using KlasseLib;
-using Microsoft.AspNetCore.Http;
+﻿using CampApi.DTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using KlasseLib;
 
-namespace WebApplication1.Controllers
+namespace CampApi.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class IssueController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class IssueController : Controller
+    private readonly AppDbContext _context;
+
+    public IssueController(AppDbContext context)
     {
-        private readonly IssueRepository _repository;
+        _context = context;
+    }
 
-        public IssueController(IssueRepository repository)
+    // GET: api/issue
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var issues = await _context.Issues
+            .Include(i => i.Room)
+            .Include(i => i.Reporter)
+            .Include(i => i.Category)
+            .ToListAsync();
+
+        return Ok(issues);
+    }
+
+    // GET: api/issue/{id}
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var issue = await _context.Issues
+            .Include(i => i.Room)
+            .Include(i => i.Reporter)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+        if (issue == null)
+            return NotFound();
+
+        return Ok(issue);
+    }
+
+    // POST: api/issue
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] IssueCreateDto dto)
+    {
+        var issue = new Issue
         {
-            _repository = repository;
-        }
+            Title = dto.Title,
+            Description = dto.Description,
+            RoomId = dto.RoomId,
+            CategoryId = dto.CategoryId,
+            ReporterUserId = dto.ReporterId,
+            Severity = dto.Severity,
+            CreatedAt = DateTime.UtcNow
+        };
 
-        [HttpGet]
-        // GET: IssueController
-        public async Task<ActionResult<List<Issue>>> GetAll()
-        {
-            var issues = await _repository.GetAllAsync();
-            return Ok(issues);
-        }
+        _context.Issues.Add(issue);
+        await _context.SaveChangesAsync();
 
-        // GET api/issue/5
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<Issue>> GetById(int id)
-        {
-            var issue = await _repository.GetByIdAsync(id);
+        return CreatedAtAction(nameof(GetById), new { id = issue.Id }, issue);
+    }
 
-            if (issue == null)
-                return NotFound($"Issue with ID {id} not found.");
+    // PUT: api/issue/{id}/status
+    [HttpPut("{id}/status")]
+    public async Task<IActionResult> UpdateStatus(int id, [FromBody] IssueUpdateStatusDto dto)
+    {
+        var issue = await _context.Issues.FindAsync(id);
+        if (issue == null)
+            return NotFound();
 
-            return Ok(issue);
-        }
+        issue.SetStatus(dto.Status);
+        await _context.SaveChangesAsync();
 
-        // POST api/issue
-        [HttpPost]
-        public async Task<ActionResult> Create(Issue issue)
-        {
-            if (issue == null)
-                return BadRequest("Issue cannot be null.");
+        return Ok(issue);
+    }
 
-            int rows = await _repository.CreateAsync(issue);
+    // PUT: api/issue/{id}/assign/{userId}
+    [HttpPut("{id}/assign/{userId}")]
+    public async Task<IActionResult> AssignIssue(int id, int userId)
+    {
+        var issue = await _context.Issues.FindAsync(id);
+        if (issue == null)
+            return NotFound();
 
-            if (rows == 0)
-                return StatusCode(500, "Could not create issue.");
+        issue.AssignedToUserId = userId;
+        await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = issue.Id }, issue);
-        }
-
-        // PUT api/issue/5
-        [HttpPut("{id:int}")]
-        public async Task<ActionResult> Update(int id, Issue update)
-        {
-            if (id != update.Id)
-                return BadRequest("ID in URL does not match issue ID.");
-
-            var exists = await _repository.GetByIdAsync(id);
-            if (exists == null)
-                return NotFound($"Issue with ID {id} not found.");
-
-            bool updated = await _repository.UpdateAsync(update);
-
-            if (!updated)
-                return StatusCode(500, "Issue could not be updated.");
-
-            return NoContent();
-        }
+        return Ok(issue);
     }
 }

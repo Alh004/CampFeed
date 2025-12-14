@@ -1,51 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CampLib.Model
+﻿namespace CampLib.Model
 {
     public class User
     {
-
-        // Instansfelter
-        private int _id;
-       
-        private string _email;
-     
-       
-
-        // property
         public int Id { get; set; }
-       
+
+        private string _email;
         public string Email
         {
             get => _email;
             set
             {
                 if (!value.EndsWith("@edu.zealand.dk"))
-                    throw new ArgumentException("Email skal ende på '@edu.zealand.dk' for at kunne logge ind.");
-
+                    throw new ArgumentException("Email skal ende på '@edu.zealand.dk'.");
                 _email = value;
             }
         }
-       
-       
+
+        // Constructor (til API POST)
+        public User() { }
 
         // Constructor
-        public User(int id, string email)
+        public User(string email)
         {
-            Id = id;
             Email = email;
-
         }
 
-        // ToString
         public override string ToString()
         {
             return $"Id: {Id}, Email: {Email}";
         }
-
     }
 }
