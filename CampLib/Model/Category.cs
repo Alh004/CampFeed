@@ -1,28 +1,22 @@
-namespace KlasseLib;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Category
+namespace KlasseLib
 {
-    public int CategoryId { get; set; }
-    public string Name { get; set; } = string.Empty;
-
-    // Underkategori – kan være null (ingen parent)
-    public int? ParentCategoryId { get; set; }
-    public bool IsActive { get; set; } = true;
-
-    public Category()
+    [Table("Categories")]  // matches your DB table
+    public class Category
     {
-    }
+        [Key]
+        [Column("CategoryId")]   // matches your DB PK
+        public int CategoryId { get; set; }
 
-    public Category(int categoryId, string name, int? parentCategoryId = null, bool isActive = true)
-    {
-        CategoryId = categoryId;
-        Name = name;
-        ParentCategoryId = parentCategoryId;
-        IsActive = isActive;
-    }
+        [Column("Name")]
+        public string Name { get; set; } = string.Empty;
 
-    public override string ToString()
-    {
-        return $"CategoryId={CategoryId}, Name={Name}, ParentCategoryId={ParentCategoryId}, IsActive={IsActive}";
+        [Column("ParentCategoryId")]
+        public int? ParentCategoryId { get; set; }
+
+        [Column("IsActive")]
+        public bool IsActive { get; set; } = true;
     }
 }

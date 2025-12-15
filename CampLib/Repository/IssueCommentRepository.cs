@@ -4,72 +4,68 @@ using KlasseLib;
 
 public class IssueCommentRepository
 {
-    private readonly SqlConnection _db;
+    private readonly string _connectionString =
+        "Server=mssql7.unoeuro.com,1433;Database=kunforhustlers_dk_db_campfeed;User Id=kunforhustlers_dk;Password=RmcAfptngeBaxkw6zr5E;Encrypt=False;";
 
-    public IssueCommentRepository()
-    {
-        _db = new SqlConnection(
-            "Server=mssql7.unoeuro.com,1433;Database=kunforhustlers_dk_db_campfeed;User Id=kunforhustlers_dk;Password=RmcAfptngeBaxkw6zr5E;Encrypt=False;");
-    }
-    
-    // CREATE COMMENT
+    // ---------------------------------------------------------
+    // ADD COMMENT
+    // ---------------------------------------------------------
     public async Task<int> AddCommentAsync(Issue_Comment comment)
     {
-        string sql = @"
-            INSERT INTO dbo.Issue_Comment (Id, Text, CreatedAt, IssueId, CreatedByUserId)
-            VALUES (@Id, @Text, @CreatedAt, @IssueId, @CreatedByUserId)
+        const string sql = @"
+            INSERT INTO Issue_Comment (Text, CreatedAt, IsInternal, IssueId, CreatedByUserId)
+            OUTPUT INSERTED.Idcomment
+            VALUES (@Text, @CreatedAt, @IsInternal, @IssueId, @CreatedByUserId);
         ";
 
-        using (var cmd = new SqlCommand(sql, _db))
-        {
-            cmd.Parameters.AddWithValue("@Id", comment.id);
-            cmd.Parameters.AddWithValue("@Text", comment.Text);
-            cmd.Parameters.AddWithValue("@CreatedAt", comment.createdAt);
-            cmd.Parameters.AddWithValue("@IssueId", comment.Issueid);
-            cmd.Parameters.AddWithValue("@CreatedByUserId", comment.CreatedByUserid);
+        await using var conn = new SqlConnection(_connectionString);
+        await conn.OpenAsync();
 
-            await _db.OpenAsync();
-            int rows = await cmd.ExecuteNonQueryAsync();
-            _db.Close();
+        await using var cmd = new SqlCommand(sql, conn);
 
-            return rows;
-        }
+        cmd.Parameters.AddWithValue("@Text", comment.Text);
+        cmd.Parameters.AddWithValue("@CreatedAt", comment.CreatedAt);
+        cmd.Parameters.AddWithValue("@IsInternal", comment.IsInternal);
+        cmd.Parameters.AddWithValue("@IssueId", comment.IssueId);
+        cmd.Parameters.AddWithValue("@CreatedByUserId", comment.CreatedByUserId);
+
+        // Returner det nye ID
+        int newId = (int)await cmd.ExecuteScalarAsync();
+        return newId;
     }
 
-   
-    // GET ALL COMMENTS FOR ISSUE
+    // ---------------------------------------------------------
+    // GET ALL COMMENTS FOR ONE ISSUE
+    // ---------------------------------------------------------
     public async Task<List<Issue_Comment>> GetCommentsForIssueAsync(int issueId)
     {
-        List<Issue_Comment> comments = new();
+        var comments = new List<Issue_Comment>();
 
-        string sql = @"
-            SELECT Id, Text, CreatedAt, IssueId, CreatedByUserId
-            FROM dbo.Issue_Comment
+        const string sql = @"
+            SELECT Idcomment, Text, CreatedAt, IsInternal, IssueId, CreatedByUserId
+            FROM Issue_Comment
             WHERE IssueId = @IssueId
-            ORDER BY CreatedAt
+            ORDER BY CreatedAt ASC;
         ";
 
-        using (var cmd = new SqlCommand(sql, _db))
+        await using var conn = new SqlConnection(_connectionString);
+        await conn.OpenAsync();
+
+        await using var cmd = new SqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("@IssueId", issueId);
+
+        using var reader = await cmd.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
         {
-            cmd.Parameters.AddWithValue("@IssueId", issueId);
-
-            await _db.OpenAsync();
-
-            using (var reader = await cmd.ExecuteReaderAsync())
+            comments.Add(new Issue_Comment
             {
-                while (await reader.ReadAsync())
-                {
-                    comments.Add(new Issue_Comment(
-                        createdAt: reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
-                        id: reader.GetInt32(reader.GetOrdinal("Id")),
-                        text: reader.GetString(reader.GetOrdinal("Text")),
-                        issueId: reader.GetInt32(reader.GetOrdinal("IssueId")),
-                        createdByUserId: reader.GetInt32(reader.GetOrdinal("CreatedByUserId"))
-                    ));
-                }
-            }
-
-            _db.Close();
+                Idcomment = reader.GetInt32(reader.GetOrdinal("Idcomment")),
+                Text = reader.GetString(reader.GetOrdinal("Text")),
+                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
+                IsInternal = reader.GetBoolean(reader.GetOrdinal("IsInternal")),
+                IssueId = reader.GetInt32(reader.GetOrdinal("IssueId")),
+                CreatedByUserId = reader.GetInt32(reader.GetOrdinal("CreatedByUserId"))
+            });
         }
 
         return comments;

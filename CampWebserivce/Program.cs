@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using KlasseLib;
 using WebApplication1;
-using WebApplication1.Services;
+using CampWebservice.Configuration;
+using CampWebservice.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 

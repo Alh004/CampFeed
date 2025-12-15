@@ -17,7 +17,7 @@ namespace CampLib.Repository
 
         public Task<User?> GetByIdAsync(int id)
         {
-            return Task.FromResult(_users.FirstOrDefault(u => u.Id == id));
+            return Task.FromResult(_users.FirstOrDefault(u => u.Iduser == id));
         }
 
         public Task<User> AddAsync(User user)
@@ -25,14 +25,14 @@ namespace CampLib.Repository
             if (!user.Email.EndsWith("@edu.zealand.dk"))
                 throw new ArgumentException("Email skal ende på @edu.zealand.dk");
 
-            user.Id = _nextId++;
+            user.Iduser = _nextId++;
             _users.Add(user);
             return Task.FromResult(user);
         }
 
         public Task<User?> UpdateAsync(int id, User updated)
         {
-            var user = _users.FirstOrDefault(u => u.Id == id);
+            var user = _users.FirstOrDefault(u => u.Iduser == id);
             if (user == null) return Task.FromResult<User?>(null);
 
             if (!updated.Email.EndsWith("@edu.zealand.dk"))
@@ -45,7 +45,7 @@ namespace CampLib.Repository
 
         public Task<bool> DeleteAsync(int id)
         {
-            var user = _users.FirstOrDefault(u => u.Id == id);
+            var user = _users.FirstOrDefault(u => u.Iduser == id);
             if (user == null) return Task.FromResult(false);
 
             _users.Remove(user);

@@ -1,5 +1,7 @@
+using CampWebservice.Services;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.Services;
+
+namespace CampApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -13,17 +15,21 @@ public class UploadController : ControllerBase
     }
 
     [HttpPost]
-    [Consumes("multipart/form-data")] // vigtigt for Swagger
+    [Consumes("multipart/form-data")]
     public async Task<IActionResult> Upload(IFormFile file, int issueId)
     {
         if (file == null || file.Length == 0)
             return BadRequest("Ingen fil uploadet.");
 
-        var result = await _cloudinary.UploadAsync(file, folder: $"issues/{issueId}");
+        using var stream = file.OpenReadStream();
+        var result = await _cloudinary.UploadImageAsync(
+            stream,
+            file.FileName
+        );
 
         return Ok(new
         {
-            url = result.SecureUrl.ToString(),
+            imageUrl = result.SecureUrl.ToString(),
             publicId = result.PublicId
         });
     }
