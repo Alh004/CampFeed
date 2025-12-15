@@ -16,7 +16,7 @@ public class CategoryRepository
     // Read all
     public async Task<List<Category>> GetAllAsync()
     {
-        var categories = new List<Category>();
+        var  Category = new List<Category>();
         string sql = "SELECT Id, Name, ParentCategoryId, IsActive FROM dbo.Category WHERE IsActive = 1 ORDER BY Name";
 
         await using var conn = new SqlConnection(_connectionString);
@@ -27,7 +27,7 @@ public class CategoryRepository
 
         while (await reader.ReadAsync())
         {
-            categories.Add(new Category
+             Category.Add(new Category
             {
                 CategoryId = reader.GetInt32(reader.GetOrdinal("Id")),
                 Name = reader.GetString(reader.GetOrdinal("Name")),
@@ -38,14 +38,14 @@ public class CategoryRepository
             });
         }
 
-        return categories;
+        return  Category;
     }
 
     // Get by Id
     public async Task<Category?> GetByIdAsync(int id)
     {
         Category? category = null;
-        string sql = "SELECT Id, Name, ParentCategoryId, IsActive FROM dbo.Category WHERE Id = @Id";
+        string sql = "SELECT CategoryId, Name, ParentCategoryId, IsActive FROM dbo.Category WHERE Id = @Id";
 
         await using var conn = new SqlConnection(_connectionString);
         await conn.OpenAsync();

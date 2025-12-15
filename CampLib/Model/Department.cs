@@ -1,18 +1,36 @@
-namespace KlasseLib;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Department
+namespace KlasseLib.Model
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-
-    public Department(int id, string name)
+    [Table("Department")]   // 👈 MATCH DIT RIGTIGE TABELLNAVN
+    public class Department
     {
-        Id = id;
-        Name = name;
-    }
+        [Key]
+        [Column("Iddepartment")]   // 👈 MATCH DIN RIGTIGE PK
+        public int Iddepartment { get; set; }
 
-    public override string ToString()
-    {
-        return $"{nameof(Id)}: {Id}, {nameof(Name)}: {Name}";
+        private string _name;
+
+        [Column("Name")]      // 👈 MATCH DB kolonnen
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("Department name må ikke være tom.");
+
+                _name = value;
+            }
+        }
+
+        public Department() { }
+
+        public Department(string name)
+        {
+            Name = name;
+        }
     }
 }

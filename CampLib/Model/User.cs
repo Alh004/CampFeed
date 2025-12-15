@@ -1,10 +1,18 @@
-﻿namespace CampLib.Model
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace CampLib.Model
 {
+    [Table("Users")]  // 👈 MATCH DIT RIGTIGE TABELLNAVN
     public class User
     {
-        public int Id { get; set; }
+        [Key]
+        [Column("Iduser")]   // 👈 MATCH DIN RIGTIGE PK
+        public int Iduser { get; set; }
 
         private string _email;
+
+        [Column("Email")]     // 👈 MATCH DB kolonnen
         public string Email
         {
             get => _email;
@@ -16,18 +24,11 @@
             }
         }
 
-        // Constructor (til API POST)
         public User() { }
 
-        // Constructor
         public User(string email)
         {
             Email = email;
-        }
-
-        public override string ToString()
-        {
-            return $"Id: {Id}, Email: {Email}";
         }
     }
 }

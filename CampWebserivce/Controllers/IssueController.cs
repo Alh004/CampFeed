@@ -16,27 +16,32 @@ public class IssueController : ControllerBase
         _context = context;
     }
 
-    // GET: api/issue
+    // GET ALL
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         var issues = await _context.Issues
             .Include(i => i.Room)
-            .Include(i => i.Reporter)
             .Include(i => i.Category)
+            .Include(i => i.Reporter)
+            .Include(i => i.AssignedTo)
+            .Include(i => i.AssignedDepartment)
             .ToListAsync();
 
         return Ok(issues);
     }
 
-    // GET: api/issue/{id}
+    // GET BY ID
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
         var issue = await _context.Issues
             .Include(i => i.Room)
+            .Include(i => i.Category)
             .Include(i => i.Reporter)
-            .FirstOrDefaultAsync(i => i.Id == id);
+            .Include(i => i.AssignedTo)
+            .Include(i => i.AssignedDepartment)
+            .FirstOrDefaultAsync(i => i.Idissue == id);
 
         if (issue == null)
             return NotFound();
@@ -44,7 +49,7 @@ public class IssueController : ControllerBase
         return Ok(issue);
     }
 
-    // POST: api/issue
+    // CREATE
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] IssueCreateDto dto)
     {
@@ -55,17 +60,17 @@ public class IssueController : ControllerBase
             RoomId = dto.RoomId,
             CategoryId = dto.CategoryId,
             ReporterUserId = dto.ReporterId,
-            Severity = dto.Severity,
-            CreatedAt = DateTime.UtcNow
+            Severity = dto.Severity.ToString(),
+            Status = "Ny"
         };
 
         _context.Issues.Add(issue);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetById), new { id = issue.Id }, issue);
+        return CreatedAtAction(nameof(GetById), new { id = issue.Idissue }, issue);
     }
 
-    // PUT: api/issue/{id}/status
+    // UPDATE STATUS
     [HttpPut("{id}/status")]
     public async Task<IActionResult> UpdateStatus(int id, [FromBody] IssueUpdateStatusDto dto)
     {
@@ -79,7 +84,7 @@ public class IssueController : ControllerBase
         return Ok(issue);
     }
 
-    // PUT: api/issue/{id}/assign/{userId}
+    // ASSIGN USER
     [HttpPut("{id}/assign/{userId}")]
     public async Task<IActionResult> AssignIssue(int id, int userId)
     {

@@ -9,6 +9,6 @@ namespace CampApi.DTO
         public int RoomId { get; set; }
         public int CategoryId { get; set; }
         public int ReporterId { get; set; }
-        public IssueSeverity Severity { get; set; }
+        public string Severity { get; set; }
     }
 }

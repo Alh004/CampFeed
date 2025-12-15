@@ -1,26 +1,29 @@
-namespace KlasseLib;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using CampLib.Model;
 
-public class Issue_Comment
+namespace KlasseLib
 {
-    public int id { get; set; }
-    public string Text { get; set; }
-    public DateTime createdAt;
-    public int Issueid { get; set; }
-    public int CreatedByUserid { get; set; }
-
-    public Issue_Comment(DateTime createdAt, int id, string text, int issueId, int createdByUserId)
+    public class Issue_Comment
     {
-        this.createdAt = createdAt;
-        id = id;
-        Text = text;
-        Issueid = issueId;
-        CreatedByUserid = createdByUserId;
-    }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Idcomment { get; set; }
 
+        [Required]
+        public string Text { get; set; } = string.Empty;
 
-    public override string ToString()
-    {
-        return
-            $"{nameof(createdAt)}: {createdAt}, {nameof(id)}: {id}, {nameof(Text)}: {Text}, {nameof(Issueid)}: {Issueid}, {nameof(CreatedByUserid)}: {CreatedByUserid}";
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public bool IsInternal { get; set; }
+
+        // FK → Issue
+        public int IssueId { get; set; }
+        public Issue? Issue { get; set; }
+
+        // FK → User der skrev kommentaren
+        public int CreatedByUserId { get; set; }
+        public User? CreatedBy { get; set; }
     }
 }
