@@ -1,30 +1,22 @@
-namespace KlasseLib;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Issue_Image
+namespace KlasseLib
 {
-    public int ImageId { get; set; }
-    public string FilePath { get; set; }
-    public string FileName { get; set; }    
-    public string ContentType { get; set; }
-    public DateTime UploadDate { get; set; }
-    public int IssueId { get; set; }
-    public int UploadedByUserId { get; set; }
-
-    public Issue_Image(int imageId, string filePath, string fileName, string contentType, DateTime uploadDate, int issueId, int uploadedByUserId)
+    public class Issue_Image
     {
-        ImageId = imageId;
-        FilePath = filePath;
-        FileName = fileName;
-        ContentType = contentType;
-        UploadDate = uploadDate;
-        IssueId = issueId;
-        UploadedByUserId = uploadedByUserId;
-    }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Idimage { get; set; }
 
-    public override string ToString()
-    {
-        return
-            $"{nameof(ImageId)}: {ImageId}, {nameof(FilePath)}: {FilePath}, {nameof(FileName)}: {FileName}, {nameof(ContentType)}: {ContentType}, {nameof(UploadDate)}: {UploadDate}, {nameof(IssueId)}: {IssueId}, {nameof(UploadedByUserId)}: {UploadedByUserId}";
+        public string FilePath { get; set; } = string.Empty;
+        public string FileName { get; set; } = string.Empty;
+        public string ContentType { get; set; } = string.Empty;
+
+        // FK → Issue
+        public int IssueId { get; set; }
+
+        // FK → User
+        public int UploadedByUserId { get; set; }
     }
 }
-

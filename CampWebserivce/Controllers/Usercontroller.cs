@@ -28,7 +28,9 @@ namespace CampApi.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var user = await _repository.GetByIdAsync(id);
-            if (user == null) return NotFound();
+            if (user == null) 
+                return NotFound();
+
             return Ok(user);
         }
 
@@ -36,31 +38,19 @@ namespace CampApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] User user)
         {
-            try
-            {
-                var addedUser = await _repository.AddAsync(user);
-                return CreatedAtAction(nameof(GetById), new { id = addedUser.Id }, addedUser);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message); // fx hvis email ikke matcher @edu.zealand.dk
-            }
+            var added = await _repository.AddAsync(user);
+            return CreatedAtAction(nameof(GetById), new { id = added.Iduser }, added);
         }
 
         // PUT: api/user/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] User user)
         {
-            try
-            {
-                var updatedUser = await _repository.UpdateAsync(id, user);
-                if (updatedUser == null) return NotFound();
-                return Ok(updatedUser);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var updated = await _repository.UpdateAsync(id, user);
+            if (updated == null)
+                return NotFound();
+
+            return Ok(updated);
         }
     }
 }

@@ -1,25 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CampLib.Model
+namespace KlasseLib
 {
     public class Role
     {
-       
-        public int Id { get; set; }
-        public string Name { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Idrole { get; set; }
 
-        public Role(int id, string name)
+        [Required]
+        public string Name { get; set; } = string.Empty;
+
+        public Role() {}
+
+        public Role(string name)
         {
-            Id = id;
             Name = name;
         }
+
         public override string ToString()
         {
-            return $"{{{nameof(Id)}={Id.ToString()}, {nameof(Name)}={Name}}}";
+            return $"Role: {Idrole} - {Name}";
         }
     }
 }
