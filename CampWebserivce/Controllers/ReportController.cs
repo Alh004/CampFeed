@@ -7,7 +7,7 @@ using CampLib.Model;
 namespace CampApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/report")]
 public class ReportController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -18,20 +18,28 @@ public class ReportController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateReport([FromBody] ReportDto dto)
+    public async Task<IActionResult> Create([FromBody] ReportDto dto)
     {
-        // 1. FIND USER ELLER OPRET NY
+        // 1️⃣ Valider input
+        if (dto == null)
+            return BadRequest("Request mangler");
+
+        // 2️⃣ Find eller opret user
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
         if (user == null)
         {
-            user = new User { Email = dto.Email };
+            user = new User
+            {
+                Email = dto.Email
+            };
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
         }
 
-        // 2. OPRET ISSUE
+        // 3️⃣ Opret Issue
         var issue = new Issue
         {
             Title = dto.Title,
@@ -45,29 +53,29 @@ public class ReportController : ControllerBase
         };
 
         _context.Issues.Add(issue);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(); // 🔑 GIVER issue.Idissue
 
-        // 3. GEM BILLEDE HVIS ET FANDTES
+        // 4️⃣ Gem billede (hvis findes)
         if (!string.IsNullOrWhiteSpace(dto.ImageUrl))
         {
             var image = new Issue_Image
             {
                 IssueId = issue.Idissue,
                 FilePath = dto.ImageUrl,
-                FileName = "",
-                ContentType = "",
-                UploadedAt = DateTime.UtcNow,
-                UploadedByUserId = user.Iduser
+                FileName = Path.GetFileName(dto.ImageUrl),
+                ContentType = "image/jpeg",
+                UploadedByUserId = user.Iduser,
+                UploadedAt = DateTime.UtcNow
             };
 
             _context.Issue_Images.Add(image);
             await _context.SaveChangesAsync();
         }
 
-        // 4. RETURNER BEKRÆFTELSE
+        // 5️⃣ Return OK
         return Ok(new
         {
-            message = "Indberetning modtaget",
+            message = "Sag oprettet",
             issueId = issue.Idissue
         });
     }

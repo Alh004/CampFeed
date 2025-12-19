@@ -1,17 +1,23 @@
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Issue_Image
+namespace KlasseLib
 {
-    [Key]
-    public int ImageId { get; set; }
+    public class Issue_Image
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int ImageId { get; set; }
 
-    public string FilePath { get; set; }
-    public string FileName { get; set; }
-    public string ContentType { get; set; }
+        public string FilePath { get; set; } = string.Empty;
+        public string FileName { get; set; } = string.Empty;
+        public string ContentType { get; set; } = string.Empty;
 
-    public int IssueId { get; set; }
+        public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
 
-    public DateTime UploadedAt { get; set; }
+        public int IssueId { get; set; }
 
-    public int UploadedByUserId { get; set; }
+        public int UploadedByUserId { get; set; }
+    }
 }

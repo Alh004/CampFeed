@@ -1,3 +1,4 @@
+using CampLib.Repository;
 using Microsoft.EntityFrameworkCore;
 using KlasseLib;
 using WebApplication1;
@@ -12,6 +13,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+// Repositories
+builder.Services.AddScoped<CategoryRepository>();
+
+
 // Cloudinary
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
 builder.Services.AddSingleton<CloudinaryService>();
@@ -19,7 +24,6 @@ builder.Services.AddSingleton<CloudinaryService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 // CORS
 builder.Services.AddCors(options =>
 {
