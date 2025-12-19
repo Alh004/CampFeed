@@ -62,7 +62,7 @@ namespace KlasseLib
         public int RoomId { get; set; }
         public Room? Room { get; set; }
 
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; }
         public Category? Category { get; set; }
 
         public int ReporterUserId { get; set; }

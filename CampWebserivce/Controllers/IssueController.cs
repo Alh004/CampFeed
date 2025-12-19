@@ -39,7 +39,7 @@ public class IssueController : ControllerBase
                 lastUpdatedAt = i.LastUpdatedAt,
                 closedAt = i.ClosedAt,
 
-                // ✅ LÆS DIREKTE FRA ISSUES
+                // ✅ BILLEDE LÆSES DIREKTE FRA ISSUES
                 imageUrl = i.ImageUrl
             })
             .ToListAsync();
@@ -69,8 +69,6 @@ public class IssueController : ControllerBase
                 createdAt = i.CreatedAt,
                 lastUpdatedAt = i.LastUpdatedAt,
                 closedAt = i.ClosedAt,
-
-                // ✅ LÆS DIREKTE FRA ISSUES
                 imageUrl = i.ImageUrl
             })
             .FirstOrDefaultAsync();
@@ -81,24 +79,66 @@ public class IssueController : ControllerBase
         return Ok(issue);
     }
 
-    // =========================
-    // PUT: api/issue/{id}/status
-    // =========================
-    [HttpPut("{id}/status")]
-    public async Task<IActionResult> UpdateStatus(
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateIssue(
         int id,
-        [FromBody] IssueUpdateStatusDto dto)
+        [FromBody] IsseuUpdateStatusDto dto)
+    {
+        if (dto == null)
+            return BadRequest("Request body mangler");
+
+        var issue = await _context.Issues.FindAsync(id);
+        if (issue == null)
+            return NotFound(new { message = "Issue not found" });
+
+        // 🔒 Opdater felter
+        issue.Status = dto.Status;
+        issue.Severity = dto.Severity;
+        issue.CategoryId = dto.CategoryId;
+        issue.LastUpdatedAt = DateTime.UtcNow;
+
+        // 🔥 Luk / genåbn logik
+        if (dto.Status == "Lukket")
+        {
+            // Sæt ClosedAt kun én gang
+            if (issue.ClosedAt == null)
+                issue.ClosedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            // Hvis sagen genåbnes → nulstil ClosedAt
+            issue.ClosedAt = null;
+        }
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new
+        {
+            message = "Issue updated",
+            issueId = issue.Idissue,
+            status = issue.Status,
+            closedAt = issue.ClosedAt
+        });
+    }
+
+
+    // =========================
+    // PUT: api/issue/{id}/category
+    // =========================
+    [HttpPut("{id}/category")]
+    public async Task<IActionResult> AssignCategory(
+        int id,
+        [FromBody] IsseuUpdateStatusDto dto)
     {
         var issue = await _context.Issues.FindAsync(id);
         if (issue == null)
             return NotFound(new { message = "Issue not found" });
 
-        issue.SetStatus(dto.Status);
+        issue.CategoryId = dto.CategoryId;
         issue.LastUpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
-
-        return Ok(new { message = "Status updated" });
+        return Ok(new { message = "Category assigned" });
     }
 
     // =========================
@@ -115,7 +155,6 @@ public class IssueController : ControllerBase
         issue.LastUpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
-
         return Ok(new { message = "Issue assigned" });
     }
 }
