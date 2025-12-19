@@ -31,4 +31,4 @@ namespace CampWebservice.Services
             return await _cloudinary.UploadAsync(uploadParams);
         }
     }
-}
+}   

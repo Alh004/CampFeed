@@ -36,6 +36,9 @@ namespace KlasseLib
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastUpdatedAt { get; set; }
         public DateTime? ClosedAt { get; set; }
+        
+        public string? ImageUrl { get; set; }
+
 
         // gemmes som tekst
         public string Status { get; set; } = "Ny";

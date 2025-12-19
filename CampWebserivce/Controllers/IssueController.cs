@@ -16,36 +16,74 @@ public class IssueController : ControllerBase
         _context = context;
     }
 
-    // GET: api/issue (admin)
+    // =========================
+    // GET: api/issue (ADMIN)
+    // =========================
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         var issues = await _context.Issues
-            .Include(i => i.Reporter)
-            .Include(i => i.Room)
-            .Include(i => i.Category)
+            .OrderByDescending(i => i.CreatedAt)
+            .Select(i => new
+            {
+                idissue = i.Idissue,
+                title = i.Title,
+                description = i.Description,
+                status = i.Status,
+                severity = i.Severity,
+                roomId = i.RoomId,
+                categoryId = i.CategoryId,
+                reporterUserId = i.ReporterUserId,
+                assignedToUserId = i.AssignedToUserId,
+                createdAt = i.CreatedAt,
+                lastUpdatedAt = i.LastUpdatedAt,
+                closedAt = i.ClosedAt,
+
+                // ✅ LÆS DIREKTE FRA ISSUES
+                imageUrl = i.ImageUrl
+            })
             .ToListAsync();
 
         return Ok(issues);
     }
 
+    // =========================
     // GET: api/issue/{id}
+    // =========================
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
         var issue = await _context.Issues
-            .Include(i => i.Reporter)
-            .Include(i => i.Room)
-            .Include(i => i.Category)
-            .FirstOrDefaultAsync(i => i.Idissue == id);
+            .Where(i => i.Idissue == id)
+            .Select(i => new
+            {
+                idissue = i.Idissue,
+                title = i.Title,
+                description = i.Description,
+                status = i.Status,
+                severity = i.Severity,
+                roomId = i.RoomId,
+                categoryId = i.CategoryId,
+                reporterUserId = i.ReporterUserId,
+                assignedToUserId = i.AssignedToUserId,
+                createdAt = i.CreatedAt,
+                lastUpdatedAt = i.LastUpdatedAt,
+                closedAt = i.ClosedAt,
+
+                // ✅ LÆS DIREKTE FRA ISSUES
+                imageUrl = i.ImageUrl
+            })
+            .FirstOrDefaultAsync();
 
         if (issue == null)
-            return NotFound();
+            return NotFound(new { message = "Issue not found" });
 
         return Ok(issue);
     }
 
+    // =========================
     // PUT: api/issue/{id}/status
+    // =========================
     [HttpPut("{id}/status")]
     public async Task<IActionResult> UpdateStatus(
         int id,
@@ -53,27 +91,31 @@ public class IssueController : ControllerBase
     {
         var issue = await _context.Issues.FindAsync(id);
         if (issue == null)
-            return NotFound();
+            return NotFound(new { message = "Issue not found" });
 
         issue.SetStatus(dto.Status);
         issue.LastUpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
-        return Ok(issue);
+
+        return Ok(new { message = "Status updated" });
     }
 
+    // =========================
     // PUT: api/issue/{id}/assign/{userId}
+    // =========================
     [HttpPut("{id}/assign/{userId}")]
     public async Task<IActionResult> Assign(int id, int userId)
     {
         var issue = await _context.Issues.FindAsync(id);
         if (issue == null)
-            return NotFound();
+            return NotFound(new { message = "Issue not found" });
 
         issue.AssignedToUserId = userId;
         issue.LastUpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
-        return Ok(issue);
+
+        return Ok(new { message = "Issue assigned" });
     }
 }
