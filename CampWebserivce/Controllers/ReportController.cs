@@ -17,6 +17,29 @@ namespace CampApi.Controllers
             _context = context;
         }
 
+        // ---------------------------------------------------------
+        // PUT: Opdater Issue (flyttet ud af POST-metoden)
+        // ---------------------------------------------------------
+        [HttpPut("api/issue/{id}")]
+        public async Task<IActionResult> UpdateIssue(int id, IssueUpdateStatusDto dto)
+        {
+            var issue = await _context.Issues.FindAsync(id);
+
+            if (issue == null)
+                return NotFound();
+
+            issue.Status = dto.Status;
+            issue.Severity = dto.Severity;
+            issue.CategoryId = dto.CategoryId;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(issue);
+        }
+
+        // ---------------------------------------------------------
+        // POST: Opret Report + Issue
+        // ---------------------------------------------------------
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ReportDto dto)
         {
@@ -54,8 +77,8 @@ namespace CampApi.Controllers
                 RoomId = dto.RoomId,
                 ReporterUserId = user.Iduser,
 
-                ImageUrl = dto.ImageUrl,   // ✅ Cloudinary URL
-                CategoryId = null,         // ✅ Admin sætter senere
+                ImageUrl = dto.ImageUrl,
+                CategoryId = null, // Admin sætter senere
                 Status = "Ny",
                 Severity = "Middel",
 

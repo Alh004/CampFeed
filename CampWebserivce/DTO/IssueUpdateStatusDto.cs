@@ -1,6 +1,11 @@
-public class IsseuUpdateStatusDto
+namespace CampApi.DTO
 {
-    public string Status { get; set; } = string.Empty;   // Ny / I gang / Lukket
-    public string Severity { get; set; } = string.Empty; // Lav / Middel / Høj
+    public class IssueUpdateStatusDto
+    {
+    public string Status { get; set; }   // Ny / I gang / Lukket
+    public string Severity { get; set; } // Lav / Middel / Høj
     public int CategoryId { get; set; }
+    
+    }
+
 }
