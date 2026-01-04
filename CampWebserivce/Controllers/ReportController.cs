@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using KlasseLib;
 using CampApi.DTO;
 using CampLib.Model;
+using CampWebservice.Services; // <-- ret namespace hvis din service ligger et andet sted
 
 namespace CampApi.Controllers
 {
@@ -11,14 +12,18 @@ namespace CampApi.Controllers
     public class ReportController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IEmailService _emailService;
+        private readonly ILogger<ReportController> _logger;
 
-        public ReportController(AppDbContext context)
+        public ReportController(AppDbContext context, IEmailService emailService, ILogger<ReportController> logger)
         {
             _context = context;
+            _emailService = emailService;
+            _logger = logger;
         }
 
         // ---------------------------------------------------------
-        // PUT: Opdater Issue (flyttet ud af POST-metoden)
+        // PUT: Opdater Issue (bemærk: din route her er nok forkert, se note nederst)
         // ---------------------------------------------------------
         [HttpPut("api/issue/{id}")]
         public async Task<IActionResult> UpdateIssue(int id, IssueUpdateStatusDto dto)
@@ -38,7 +43,7 @@ namespace CampApi.Controllers
         }
 
         // ---------------------------------------------------------
-        // POST: Opret Report + Issue
+        // POST: Opret Report + Issue + send bekræftelsesmail
         // ---------------------------------------------------------
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ReportDto dto)
@@ -81,14 +86,27 @@ namespace CampApi.Controllers
                 CategoryId = null, // Admin sætter senere
                 Status = "Ny",
                 Severity = "Middel",
-
                 CreatedAt = DateTime.UtcNow
             };
 
             _context.Issues.Add(issue);
             await _context.SaveChangesAsync();
 
-            // ✅ 4) Return OK
+            // ✉️ 4) Send bekræftelsesmail (må ikke blokere oprettelsen)
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(user.Email))
+                {
+                    await _emailService.SendIssueCreatedAsync(user.Email, issue.Idissue, issue.Title);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send created email for IssueId {IssueId}", issue.Idissue);
+                // fortsæt – issue er allerede oprettet
+            }
+
+            // ✅ 5) Return OK
             return Ok(new
             {
                 message = "Sag oprettet",

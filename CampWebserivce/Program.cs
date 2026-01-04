@@ -23,6 +23,8 @@ builder.Services.AddSingleton<CloudinaryService>(); // én instans
 
 
 builder.Services.AddScoped<CampWebservice.Services.IEmailService, CampWebservice.Services.EmailService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 
 // API + Swagger
