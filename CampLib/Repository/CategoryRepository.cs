@@ -25,9 +25,8 @@ public class CategoryRepository
                 CategoryId,
                 Name,
                 ParentCategoryId,
-                IsActive
+                
             FROM dbo.Categories
-            WHERE IsActive = 1
             ORDER BY Name
         ";
 
@@ -46,7 +45,6 @@ public class CategoryRepository
                 ParentCategoryId = reader.IsDBNull(reader.GetOrdinal("ParentCategoryId"))
                     ? null
                     : reader.GetInt32(reader.GetOrdinal("ParentCategoryId")),
-                IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"))
             });
         }
 
@@ -86,7 +84,6 @@ public class CategoryRepository
                 ParentCategoryId = reader.IsDBNull(reader.GetOrdinal("ParentCategoryId"))
                     ? null
                     : reader.GetInt32(reader.GetOrdinal("ParentCategoryId")),
-                IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"))
             };
         }
 
@@ -99,7 +96,7 @@ public class CategoryRepository
     public async Task<Category> AddAsync(Category category)
     {
         string sql = @"
-            INSERT INTO dbo.Categories (Name, ParentCategoryId, IsActive)
+            INSERT INTO dbo.Categories (Name, ParentCategoryId,)
             OUTPUT INSERTED.CategoryId
             VALUES (@Name, @ParentCategoryId, @IsActive)
         ";
@@ -113,7 +110,6 @@ public class CategoryRepository
             "@ParentCategoryId",
             (object?)category.ParentCategoryId ?? DBNull.Value
         );
-        cmd.Parameters.AddWithValue("@IsActive", category.IsActive);
 
         var insertedId = (int)await cmd.ExecuteScalarAsync();
         category.CategoryId = insertedId;
@@ -145,7 +141,6 @@ public class CategoryRepository
             "@ParentCategoryId",
             (object?)category.ParentCategoryId ?? DBNull.Value
         );
-        cmd.Parameters.AddWithValue("@IsActive", category.IsActive);
 
         var rows = await cmd.ExecuteNonQueryAsync();
         return rows > 0 ? category : null;
