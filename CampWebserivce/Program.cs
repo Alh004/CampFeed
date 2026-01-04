@@ -1,31 +1,45 @@
+using CampLib.Repository;
 using Microsoft.EntityFrameworkCore;
 using KlasseLib;
 using WebApplication1;
-using WebApplication1.Services;
+using CampWebservice.Configuration;
+using CampWebservice.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Database
+// DB
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")) // connection string
 );
 
-// Cloudinary
-builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
-builder.Services.AddSingleton<CloudinaryService>();
+// Repos
+builder.Services.AddScoped<CategoryRepository>(); // pr. request
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Cloudinary
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("Cloudinary") // læs config
+);
+builder.Services.AddSingleton<CloudinaryService>(); // én instans
+
+
+builder.Services.AddScoped<CampWebservice.Services.IEmailService, CampWebservice.Services.EmailService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+
+
+// API + Swagger
+builder.Services.AddControllers();           // controllers
+builder.Services.AddEndpointsApiExplorer();  // swagger endpoints
+builder.Services.AddSwaggerGen();            // swagger docs
 
 // CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader();
+        policy.AllowAnyOrigin() // alle origins (dev)
+            .AllowAnyMethod() // alle methods
+            .AllowAnyHeader();// alle headers
     });
 });
 
@@ -34,16 +48,14 @@ var app = builder.Build();
 // Middleware
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwagger();   // swagger json
+    app.UseSwaggerUI(); // swagger UI
 }
 
-// IMPORTANT: CORS MUST COME BEFORE HTTPS REDIRECTION
-app.UseCors("AllowAll");
+app.UseCors("AllowAll"); // tillad frontend
 
-// Optional: Disable HTTPS for local dev if needed
-// app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); // https redirect (valgfri)
 
-app.UseAuthorization();
-app.MapControllers();
-app.Run();
+app.UseAuthorization();  // auth pipeline
+app.MapControllers();    // map routes
+app.Run();               // start app

@@ -1,6 +1,11 @@
-using KlasseLib;
-
-public class IssueUpdateStatusDto
+namespace CampApi.DTO
 {
-    public IssueStatus Status { get; set; }
+    public class IssueUpdateStatusDto
+    {
+    public string Status { get; set; }   // Ny / I gang / Lukket
+    public string Severity { get; set; } // Lav / Middel / Høj
+    public int CategoryId { get; set; }
+    
+    }
+
 }

@@ -36,6 +36,9 @@ namespace KlasseLib
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastUpdatedAt { get; set; }
         public DateTime? ClosedAt { get; set; }
+        
+        public string? ImageUrl { get; set; }
+
 
         // gemmes som tekst
         public string Status { get; set; } = "Ny";
@@ -59,7 +62,7 @@ namespace KlasseLib
         public int RoomId { get; set; }
         public Room? Room { get; set; }
 
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; }
         public Category? Category { get; set; }
 
         public int ReporterUserId { get; set; }

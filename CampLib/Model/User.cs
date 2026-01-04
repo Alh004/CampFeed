@@ -24,11 +24,14 @@ namespace CampLib.Model
             }
         }
 
-        public User() { }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public User() {}
 
         public User(string email)
         {
             Email = email;
+            CreatedAt = DateTime.UtcNow;
         }
     }
 }

@@ -16,7 +16,6 @@ namespace KlasseLib
         [Column("ParentCategoryId")]
         public int? ParentCategoryId { get; set; }
 
-        [Column("IsActive")]
-        public bool IsActive { get; set; } = true;
+      
     }
 }

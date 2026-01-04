@@ -16,7 +16,11 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5005",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+
+        "CLOUDINARY__CLOUDNAME": "dzppdbkte",
+        "CLOUDINARY__APIKEY": "923728393167834",
+        "CLOUDINARY__APISECRET": "923728393167834"
       }
     },
     "https": {
@@ -26,7 +30,11 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7099;http://localhost:5005",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+
+        "CLOUDINARY__CLOUDNAME": "DIN_CLOUD_NAME",
+        "CLOUDINARY__APIKEY": "DIN_API_KEY",
+        "CLOUDINARY__APISECRET": "DIN_API_SECRET"
       }
     },
     "IIS Express": {
@@ -34,7 +42,11 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+
+        "CLOUDINARY__CLOUDNAME": "DIN_CLOUD_NAME",
+        "CLOUDINARY__APIKEY": "DIN_API_KEY",
+        "CLOUDINARY__APISECRET": "DIN_API_SECRET"
       }
     }
   }

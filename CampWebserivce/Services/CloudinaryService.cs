@@ -1,36 +1,34 @@
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using CampWebservice.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace WebApplication1.Services;
-
-public class CloudinaryService
+namespace CampWebservice.Services
 {
-    private readonly Cloudinary _cloudinary;
-
-    public CloudinaryService(IOptions<CloudinarySettings> settings)
+    public class CloudinaryService
     {
-        var s = settings.Value;
-        var acc = new Account(s.CloudName, s.ApiKey, s.ApiSecret);
-        _cloudinary = new Cloudinary(acc);
-        _cloudinary.Api.Secure = true;
-    }
+        private readonly Cloudinary _cloudinary;
 
-    public async Task<ImageUploadResult> UploadAsync(IFormFile file, string folder = "uploads")
-    {
-        if (file == null || file.Length == 0)
-            throw new ArgumentException("Ingen fil uploadet");
-
-        using var stream = file.OpenReadStream();
-        var uploadParams = new ImageUploadParams
+        public CloudinaryService(IOptions<CloudinarySettings> settings)
         {
-            File = new FileDescription(file.FileName, stream),
-            Folder = folder,
-            UseFilename = true,
-            UniqueFilename = true,
-            Overwrite = false
-        };
+            var account = new Account(
+                settings.Value.CloudName,
+                settings.Value.ApiKey,
+                settings.Value.ApiSecret
+            );
 
-        return await _cloudinary.UploadAsync(uploadParams);
+            _cloudinary = new Cloudinary(account);
+        }
+
+        public async Task<ImageUploadResult> UploadImageAsync(Stream fileStream, string fileName)
+        {
+            var uploadParams = new ImageUploadParams
+            {
+                File = new FileDescription(fileName, fileStream),
+                Folder = "campfeed/issues"
+            };
+
+            return await _cloudinary.UploadAsync(uploadParams);
+        }
     }
-}
+}   

@@ -6,18 +6,29 @@ namespace CampLib.Repository;
 
 public class CategoryRepository
 {
-    private readonly string _connectionString = 
+    private readonly string _connectionString =
         "Server=mssql7.unoeuro.com,1433;" +
         "Database=kunforhustlers_dk_db_campfeed;" +
         "User Id=kunforhustlers_dk;" +
         "Password=RmcAfptngeBaxkw6zr5E;" +
         "Encrypt=False;";
 
-    // Read all
+    // =========================
+    // GET ALL
+    // =========================
     public async Task<List<Category>> GetAllAsync()
     {
-        var  Category = new List<Category>();
-        string sql = "SELECT Id, Name, ParentCategoryId, IsActive FROM dbo.Category WHERE IsActive = 1 ORDER BY Name";
+        var categories = new List<Category>();
+
+        string sql = @"
+            SELECT 
+                CategoryId,
+                Name,
+                ParentCategoryId,
+                
+            FROM dbo.Categories
+            ORDER BY Name
+        ";
 
         await using var conn = new SqlConnection(_connectionString);
         await conn.OpenAsync();
@@ -27,55 +38,66 @@ public class CategoryRepository
 
         while (await reader.ReadAsync())
         {
-             Category.Add(new Category
+            categories.Add(new Category
             {
-                CategoryId = reader.GetInt32(reader.GetOrdinal("Id")),
+                CategoryId = reader.GetInt32(reader.GetOrdinal("CategoryId")),
                 Name = reader.GetString(reader.GetOrdinal("Name")),
                 ParentCategoryId = reader.IsDBNull(reader.GetOrdinal("ParentCategoryId"))
                     ? null
                     : reader.GetInt32(reader.GetOrdinal("ParentCategoryId")),
-                IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"))
             });
         }
 
-        return  Category;
+        return categories;
     }
 
-    // Get by Id
-    public async Task<Category?> GetByIdAsync(int id)
+    // =========================
+    // GET BY ID
+    // =========================
+    public async Task<Category?> GetByIdAsync(int categoryId)
     {
         Category? category = null;
-        string sql = "SELECT CategoryId, Name, ParentCategoryId, IsActive FROM dbo.Category WHERE Id = @Id";
+
+        string sql = @"
+            SELECT 
+                CategoryId,
+                Name,
+                ParentCategoryId,
+                IsActive
+            FROM dbo.Categories
+            WHERE CategoryId = @CategoryId
+        ";
 
         await using var conn = new SqlConnection(_connectionString);
         await conn.OpenAsync();
 
         await using var cmd = new SqlCommand(sql, conn);
-        cmd.Parameters.AddWithValue("@Id", id);
+        cmd.Parameters.AddWithValue("@CategoryId", categoryId);
 
         await using var reader = await cmd.ExecuteReaderAsync();
         if (await reader.ReadAsync())
         {
             category = new Category
             {
-                CategoryId = reader.GetInt32(reader.GetOrdinal("Id")),
+                CategoryId = reader.GetInt32(reader.GetOrdinal("CategoryId")),
                 Name = reader.GetString(reader.GetOrdinal("Name")),
                 ParentCategoryId = reader.IsDBNull(reader.GetOrdinal("ParentCategoryId"))
                     ? null
                     : reader.GetInt32(reader.GetOrdinal("ParentCategoryId")),
-                IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"))
             };
         }
 
         return category;
     }
 
-    // Create / AddAsync
+    // =========================
+    // CREATE
+    // =========================
     public async Task<Category> AddAsync(Category category)
     {
         string sql = @"
-            INSERT INTO dbo.Category (Name, ParentCategoryId, IsActive)
-            OUTPUT INSERTED.Id
+            INSERT INTO dbo.Categories (Name, ParentCategoryId,)
+            OUTPUT INSERTED.CategoryId
             VALUES (@Name, @ParentCategoryId, @IsActive)
         ";
 
@@ -84,38 +106,43 @@ public class CategoryRepository
 
         await using var cmd = new SqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("@Name", category.Name);
-        cmd.Parameters.AddWithValue("@ParentCategoryId", (object?)category.ParentCategoryId ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@IsActive", category.IsActive);
+        cmd.Parameters.AddWithValue(
+            "@ParentCategoryId",
+            (object?)category.ParentCategoryId ?? DBNull.Value
+        );
 
-        // Hent det auto-genererede Id
         var insertedId = (int)await cmd.ExecuteScalarAsync();
         category.CategoryId = insertedId;
 
         return category;
     }
 
-    // UpdateAsync
-    public async Task<Category?> UpdateAsync(int id, Category category)
+    // =========================
+    // UPDATE
+    // =========================
+    public async Task<Category?> UpdateAsync(int categoryId, Category category)
     {
         string sql = @"
-            UPDATE dbo.Category
-            SET Name = @Name,
+            UPDATE dbo.Categories
+            SET 
+                Name = @Name,
                 ParentCategoryId = @ParentCategoryId,
                 IsActive = @IsActive
-            WHERE Id = @Id
+            WHERE CategoryId = @CategoryId
         ";
 
         await using var conn = new SqlConnection(_connectionString);
         await conn.OpenAsync();
 
         await using var cmd = new SqlCommand(sql, conn);
-        cmd.Parameters.AddWithValue("@Id", id);
+        cmd.Parameters.AddWithValue("@CategoryId", categoryId);
         cmd.Parameters.AddWithValue("@Name", category.Name);
-        cmd.Parameters.AddWithValue("@ParentCategoryId", (object?)category.ParentCategoryId ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@IsActive", category.IsActive);
+        cmd.Parameters.AddWithValue(
+            "@ParentCategoryId",
+            (object?)category.ParentCategoryId ?? DBNull.Value
+        );
 
         var rows = await cmd.ExecuteNonQueryAsync();
         return rows > 0 ? category : null;
     }
-    
 }
