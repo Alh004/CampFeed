@@ -57,7 +57,8 @@ public class EmailService : IEmailService
         );
 
         await client.SendMailAsync(msg);
-    }
+    } //Added by 
+
 
     public async Task SendIssueClosedAsync(string toEmail, int issueId, string title)
     {

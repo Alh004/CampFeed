@@ -58,6 +58,7 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
+//Added by 
 
 var app = builder.Build();
 

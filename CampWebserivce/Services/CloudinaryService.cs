@@ -18,7 +18,8 @@ namespace CampWebservice.Services
             );
 
             _cloudinary = new Cloudinary(account);
-        }
+        } //Added by 
+
 
         public async Task<ImageUploadResult> UploadImageAsync(Stream fileStream, string fileName)
         {

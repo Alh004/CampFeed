@@ -19,6 +19,7 @@ public class CategoryRepository
     public async Task<List<Category>> GetAllAsync()
     {
         var categories = new List<Category>();
+        //Added by 
 
         string sql = @"
             SELECT 

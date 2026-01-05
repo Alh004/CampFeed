@@ -5,4 +5,4 @@ public class ReportDto
     public string Description { get; set; } = string.Empty;
     public int RoomId { get; set; }
     public string? ImageUrl { get; set; }
-}
+} //Added by 

@@ -3,16 +3,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CampLib.Model
 {
-    [Table("Users")]  
+    [Table("Users")]  // 👈 MATCH DIT RIGTIGE TABELLNAVN
     public class User
     {
         [Key]
-        [Column("Iduser")]   
+        //Added by 
+
+        [Column("Iduser")]   // 👈 MATCH DIN RIGTIGE PK
         public int Iduser { get; set; }
 
         private string _email;
 
-        [Column("Email")]     
+        [Column("Email")]     // 👈 MATCH DB kolonnen
         public string Email
         {
             get => _email;

@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KlasseLib.Model
+
+    //Added by 
+
 {
     [Table("Department")]   // 👈 MATCH DIT RIGTIGE TABELLNAVN
     public class Department

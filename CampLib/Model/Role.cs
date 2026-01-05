@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KlasseLib
 {
+    //Added by 
+
     public class Role
     {
         [Key]

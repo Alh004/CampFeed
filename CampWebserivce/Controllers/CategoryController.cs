@@ -14,6 +14,7 @@ public class CategoryController : ControllerBase
     {
         _repo = repo;
     }
+    //Added by 
 
     [HttpGet]
     public async Task<IActionResult> GetAll()

@@ -11,6 +11,7 @@ namespace KlasseLib
             : base(options)
         {
         }
+        //Added by 
 
         public DbSet<Issue> Issues { get; set; }
         public DbSet<User> Users { get; set; }

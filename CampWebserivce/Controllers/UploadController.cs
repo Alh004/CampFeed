@@ -33,4 +33,4 @@ public class UploadController : ControllerBase
             imageUrl = result.SecureUrl.ToString()
         });
     }
-}
+} //Added by 

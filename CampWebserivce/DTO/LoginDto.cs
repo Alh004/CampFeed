@@ -5,4 +5,4 @@ namespace CampApi.DTO
         public string Username { get; set; }
         public string? Password { get; set; }
     }
-}
+} //Added by 

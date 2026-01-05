@@ -6,6 +6,8 @@ using KlasseLib.Model;
 
 namespace KlasseLib
 {
+    //Added by 
+
     public enum IssueStatus
     {
         Ny,

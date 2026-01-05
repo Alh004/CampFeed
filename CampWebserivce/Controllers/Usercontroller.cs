@@ -22,6 +22,7 @@ namespace CampApi.Controllers
             var users = await _repository.GetAllAsync();
             return Ok(users);
         }
+        //Added by 
 
         // GET: api/user/{id}
         [HttpGet("{id}")]

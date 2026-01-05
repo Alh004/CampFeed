@@ -11,7 +11,8 @@ public class Room
 
     public Room()
     {
-    }
+    } //Added by 
+    
 
     public Room(int roomId, string roomName, string building, string? qrCodeToken = null)
     {

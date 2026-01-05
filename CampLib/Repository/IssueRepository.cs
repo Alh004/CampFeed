@@ -12,6 +12,7 @@ namespace CampLib.Repository
             "User Id=kunforhustlers_dk;" +
             "Password=RmcAfptngeBaxkw6zr5E;" +
             "Encrypt=False;";
+        //Added by 
 
         public async Task<List<Issue>> GetAllAsync()
         {

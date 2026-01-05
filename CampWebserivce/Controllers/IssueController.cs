@@ -6,6 +6,7 @@ using CampWebservice.Services; // <-- Hvis din EmailService namespace er anderle
 using Microsoft.Extensions.Logging;
 
 namespace CampApi.Controllers;
+//Added by 
 
 [ApiController]
 [Route("api/issue")]

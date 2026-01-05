@@ -48,6 +48,7 @@ namespace CampLib.Repository
             var email = _users.FirstOrDefault(u => u.Iduser == userId)?.Email;
             return Task.FromResult(email);
         }
+        //Added by 
 
 
         public Task<bool> DeleteAsync(int id)

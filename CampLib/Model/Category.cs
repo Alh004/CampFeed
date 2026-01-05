@@ -2,7 +2,11 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KlasseLib
+
+
 {
+    //Added by 
+    
     [Table("Categories")]  // matches your DB table
     public class Category
     {

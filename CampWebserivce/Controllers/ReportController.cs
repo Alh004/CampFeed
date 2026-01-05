@@ -105,6 +105,7 @@ namespace CampApi.Controllers
                 _logger.LogError(ex, "Failed to send created email for IssueId {IssueId}", issue.Idissue);
                 // fortsæt – issue er allerede oprettet
             }
+            //Added by 
 
             // ✅ 5) Return OK
             return Ok(new

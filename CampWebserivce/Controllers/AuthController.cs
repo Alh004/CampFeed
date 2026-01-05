@@ -8,6 +8,8 @@ namespace CampApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+//Added by 
+
 public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
