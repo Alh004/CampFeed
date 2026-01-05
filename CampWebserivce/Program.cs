@@ -1,10 +1,11 @@
 using CampLib.Repository;
+using CampLib.Repositorya;
 using Microsoft.EntityFrameworkCore;
 using KlasseLib;
 using WebApplication1;
 using CampWebservice.Configuration;
 using CampWebservice.Services;
-
+f
 var builder = WebApplication.CreateBuilder(args);
 
 // DB
@@ -14,6 +15,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Repos
 builder.Services.AddScoped<CategoryRepository>(); // pr. request
+builder.Services.AddScoped<StaffRepository>(); // pr. request
 
 // Cloudinary
 builder.Services.Configure<CloudinarySettings>(

@@ -12,7 +12,7 @@ public class CategoryRepository
         "User Id=kunforhustlers_dk;" +
         "Password=RmcAfptngeBaxkw6zr5E;" +
         "Encrypt=False;";
-
+d
     // =========================
     // GET ALL
     // =========================

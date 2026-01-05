@@ -6,14 +6,16 @@ using KlasseLib;
 
 namespace CampApi.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
+        [ApiController]
+    [Route("api/[controller]")]
+//Added by 
+
 public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
     public AuthController(AppDbContext ctx) { _context = ctx; }
 
-    [HttpPost("check")]
+    [HttpPost("check")]d
     public async Task<IActionResult> CheckUser([FromBody] EmailDto dto)
     {
         if (!dto.Email.EndsWith("@edu.zealand.dk"))

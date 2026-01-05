@@ -1,5 +1,5 @@
 namespace CampApi.DTO
-{
+{f
     public class IssueUpdateStatusDto
     {
     public string Status { get; set; }   // Ny / I gang / Lukket

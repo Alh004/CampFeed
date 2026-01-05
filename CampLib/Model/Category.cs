@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+d
 namespace KlasseLib
 {
     [Table("Categories")]  // matches your DB table

@@ -14,7 +14,7 @@ namespace CampLib.Repository
             "Encrypt=False;";
 
         public async Task<List<Issue>> GetAllAsync()
-        {
+        {d
             var list = new List<Issue>();
             string sql = @"SELECT * FROM Issues";
 

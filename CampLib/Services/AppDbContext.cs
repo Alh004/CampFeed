@@ -9,7 +9,7 @@ namespace KlasseLib
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
-        {
+        {d
         }
 
         public DbSet<Issue> Issues { get; set; }
