@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CampLib.Repository
+namespace CampLib.Repositorya
 {
     public class StaffRepository
     {

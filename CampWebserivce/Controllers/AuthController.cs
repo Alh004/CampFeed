@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using KlasseLib;
 
 namespace CampApi.Controllers;
-
+a
 [ApiController]
 [Route("api/[controller]")]
 //Added by 

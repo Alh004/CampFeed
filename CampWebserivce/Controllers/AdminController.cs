@@ -1,8 +1,9 @@
+using CampLib.Repository;
 using CampLib.Model;
 using KlasseLib;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-
+a
 namespace WebApplication1.Controllers;
 
 [ApiController]
@@ -10,6 +11,12 @@ namespace WebApplication1.Controllers;
 public class AdminController : ControllerBase
 {
     private readonly PasswordHasher<Admin> _hasher = new();
+    private readonly StaffRepository _staffRepository;
+
+    public AdminController(StaffRepository staffRepository)
+    {
+        _staffRepository = staffRepository;
+    }
 
     public class LoginDto
     {
@@ -17,61 +24,59 @@ public class AdminController : ControllerBase
         public string? Password { get; set; }
     }
 
-    // =======================
-    // LOGIN ENDPOINT
-    // =======================
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginDto dto)
+    public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
         if (dto == null)
             return BadRequest("DTO er null");
 
-        Console.WriteLine("=== Modtaget fra frontend ===");
-        Console.WriteLine($"Username: '{dto.Username}'");
-        Console.WriteLine($"Password: '{dto.Password}'");
+        var username = dto.Username?.Trim().ToLower();
+        var password = dto.Password?.Trim();
 
-        string username = dto.Username?.Trim() ?? "";
-        string? password = dto.Password?.Trim();
-
-        // Admin login
-        if (username.Equals(AdminLogin.AdminUser.Username, StringComparison.OrdinalIgnoreCase))
+        // =========================
+        // 🔐 ADMIN LOGIN
+        // =========================
+        if (username == AdminLogin.AdminUser.Username.ToLower())
         {
-            var result = _hasher.VerifyHashedPassword(null, AdminLogin.AdminUser.PasswordHash, password ?? "");
-            Console.WriteLine("VerifyHashedPassword result: " + result);
+            var result = _hasher.VerifyHashedPassword(
+                null,
+                AdminLogin.AdminUser.PasswordHash,
+                password ?? ""
+            );
 
             if (result != PasswordVerificationResult.Success)
                 return Unauthorized("Forkert admin password");
 
             HttpContext.Session.SetString("IsAdmin", "true");
             HttpContext.Session.SetString("Username", username);
-            return Ok(new { role = "admin", username });
+
+            return Ok(new { role = "admin" });
         }
 
-        // Student login
-        if (!username.EndsWith("@edu.zealand.dk", StringComparison.OrdinalIgnoreCase))
-            return Unauthorized("Ugyldig username");
+        // =========================
+        // 🔐 STAFF LOGIN
+        // =========================
+        var staff = await _staffRepository.GetByUsernameAsync(username);
+        if (staff != null)
+        {
+            if (staff.Password != password)
+                return Unauthorized("Forkert staff password");
+
+            HttpContext.Session.SetString("IsAdmin", "true"); // 👈 VIGTIG
+            HttpContext.Session.SetString("Username", username);
+
+            return Ok(new { role = "admin" });
+        }
+
+        // =========================
+        // 🎓 STUDENT LOGIN
+        // =========================
+        if (!username.EndsWith("@edu.zealand.dk"))
+            return Unauthorized("Ugyldig bruger");
 
         HttpContext.Session.SetString("IsStudent", "true");
         HttpContext.Session.SetString("Username", username);
-        return Ok(new { role = "student", username });
-    }
 
-    // =======================
-    // GET CURRENT USER
-    // =======================
-    [HttpGet("me")]
-    public IActionResult Me()
-    {
-        if (HttpContext.Session.GetString("IsAdmin") == "true")
-        {
-            return Ok(new { role = "admin", username = HttpContext.Session.GetString("Username") });
-        }
-
-        if (HttpContext.Session.GetString("IsStudent") == "true")
-        {
-            return Ok(new { role = "student", username = HttpContext.Session.GetString("Username") });
-        }
-
-        return Unauthorized("Ikke logget ind");
+        return Ok(new { role = "student" });
     }
 }

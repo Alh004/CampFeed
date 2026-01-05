@@ -1,7 +1,7 @@
 using CampLib.Model;
 using Microsoft.AspNetCore.Identity;
 
-namespace KlasseLib;
+namespace KlasseLib;a
 
 public class AdminLogin
 {

@@ -1,5 +1,5 @@
 namespace CampApi.DTO
-{
+{a
     public class LoginDto
     {
         public string Username { get; set; }
