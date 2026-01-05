@@ -1,9 +1,6 @@
 using CampLib.Repository;
-using Microsoft.EntityFrameworkCore;
 using KlasseLib;
-using WebApplication1;
-using CampWebservice.Configuration;
-using CampWebservice.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,30 +18,26 @@ builder.Services.AddScoped<CategoryRepository>();
 builder.Services.AddSingleton<StaffRepository>();
 
 // =======================
-// CLOUDINARY
-// =======================
-builder.Services.Configure<CloudinarySettings>(
-    builder.Configuration.GetSection("Cloudinary")
-);
-builder.Services.AddSingleton<CloudinaryService>();
-
-// =======================
-// SESSION (VIGTIG)
+// SESSION
 // =======================
 builder.Services.AddDistributedMemoryCache();
-
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = ".CampFeed.Session";
     options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.None; // 🔥 VIGTIG
 });
 
 // =======================
-// CONTROLLERS + SWAGGER
+// CONTROLLERS
 // =======================
 builder.Services.AddControllers();
+
+// =======================
+// SWAGGER
+// =======================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -53,37 +46,34 @@ builder.Services.AddSwaggerGen();
 // =======================
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy.WithOrigins(
+                "http://127.0.0.1:5502",
+                "http://localhost:5502",
+                "http://127.0.0.1:5503"   // <-- tilføjet
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
 var app = builder.Build();
 
-// =======================
-// MIDDLEWARE PIPELINE
-// =======================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// CORS skal ligge tidligt
-app.UseCors("AllowAll");
-
-// app.UseHttpsRedirection(); // valgfri i dev
+// 🔥 RÆKKEFØLGE ER KRITISK
+app.UseCors("AllowFrontend");
 
 app.UseRouting();
 
-// 🔥 SESSION SKAL LIGGE HER
-app.UseSession();
-
+app.UseSession();       // 🔥 SKAL KOMME FØR AUTH
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();

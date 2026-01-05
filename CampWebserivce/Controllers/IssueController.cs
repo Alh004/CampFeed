@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using KlasseLib;
-using CampWebservice.Services; // <-- hvis din EmailService namespace er anderledes, ret den
-// using CampApi.Services;      // <-- alternativ namespace
+using CampWebservice.Services; // <-- Hvis din EmailService namespace er anderledes, ret den
+using Microsoft.Extensions.Logging;
 
 namespace CampApi.Controllers;
 
@@ -90,6 +90,7 @@ public class IssueController : ControllerBase
         return Ok(issue);
     }
 
+    // PUT: api/issue/{id}
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateIssue(int id, [FromBody] IssueUpdateStatusDto dto)
     {
@@ -111,22 +112,20 @@ public class IssueController : ControllerBase
         // 🔥 Luk / genåbn logik
         if (dto.Status == "Lukket")
         {
-            // Sæt ClosedAt kun én gang
             if (issue.ClosedAt == null)
             {
                 issue.ClosedAt = DateTime.UtcNow;
-                shouldSendClosedEmail = true; // send kun mail første gang den lukkes
+                shouldSendClosedEmail = true;
             }
         }
         else
         {
-            // Hvis sagen genåbnes → nulstil ClosedAt
             issue.ClosedAt = null;
         }
 
         await _context.SaveChangesAsync();
 
-        // ✉️ Send mail efter DB er opdateret (robust: mail må ikke blokere)
+        // ✉️ Send mail efter DB er opdateret
         if (shouldSendClosedEmail && issue.ReporterUserId != null)
         {
             try
@@ -182,3 +181,4 @@ public class IssueController : ControllerBase
         return Ok(new { message = "Issue assigned" });
     }
 }
+ 
