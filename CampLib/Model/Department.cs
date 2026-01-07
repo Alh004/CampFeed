@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-d
+
 namespace KlasseLib.Model
 {
     [Table("Department")]   // 👈 MATCH DIT RIGTIGE TABELLNAVN

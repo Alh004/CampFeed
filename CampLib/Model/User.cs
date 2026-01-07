@@ -22,7 +22,7 @@ namespace CampLib.Model
                     throw new ArgumentException("Email skal ende på '@edu.zealand.dk'.");
                 _email = value;
             }
-        }d
+        }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

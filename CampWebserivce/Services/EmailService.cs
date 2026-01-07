@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Mail;
 
 namespace CampWebservice.Services;
-f
+
 public interface IEmailService
 {
     Task SendIssueCreatedAsync(string toEmail, int issueId, string title);

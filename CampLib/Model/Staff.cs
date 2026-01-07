@@ -1,7 +1,7 @@
 namespace CampLib.Model;
 
 public class Staff
-{d
+{
     public int Id { get; set; }
 
 

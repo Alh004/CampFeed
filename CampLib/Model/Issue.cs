@@ -5,7 +5,7 @@ using CampLib.Model;
 using KlasseLib.Model;
 
 namespace KlasseLib
-{ f
+{ 
     public enum IssueStatus
     {
         Ny,

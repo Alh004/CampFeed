@@ -107,7 +107,7 @@ namespace CampLib.Repositorya
                     reader.GetString(reader.GetOrdinal("Username")),
                     reader.GetString(reader.GetOrdinal("Password"))
                 );
-            }d
+            }
 
             return staff;
         }

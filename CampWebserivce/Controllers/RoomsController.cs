@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using KlasseLib;
-f
+
 namespace StudyFeedback.Web.Controllers;
 
 [ApiController]

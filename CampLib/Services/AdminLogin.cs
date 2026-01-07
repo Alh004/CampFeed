@@ -13,4 +13,4 @@ public class AdminLogin
             new PasswordHasher<Admin>()
                 .HashPassword(null, "saadersej")
         );
-}d
+}

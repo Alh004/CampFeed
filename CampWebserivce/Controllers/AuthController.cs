@@ -15,7 +15,7 @@ public class AuthController : ControllerBase
     private readonly AppDbContext _context;
     public AuthController(AppDbContext ctx) { _context = ctx; }
 
-    [HttpPost("check")]d
+    [HttpPost("check")]
     public async Task<IActionResult> CheckUser([FromBody] EmailDto dto)
     {
         if (!dto.Email.EndsWith("@edu.zealand.dk"))

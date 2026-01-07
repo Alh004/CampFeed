@@ -1,5 +1,5 @@
 namespace WebApplication1;
-f
+
 public class WeatherForecast
 {
     public DateOnly Date { get; set; }

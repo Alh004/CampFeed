@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApplication1.Controllers;
 
 [ApiController]
-[Route("api/auth")]d
+[Route("api/auth")]
 public class AdminController : ControllerBase
 {
     private readonly PasswordHasher<Admin> _hasher = new();
@@ -55,18 +55,19 @@ public class AdminController : ControllerBase
         }
 
         // =========================
-        // 🔐 STAFF LOGIN
-        // =========================
+// 🔐 STAFF LOGIN
+// =========================
         var staff = await _staffRepository.GetByUsernameAsync(username);
         if (staff != null)
         {
             if (staff.Password != password)
                 return Unauthorized("Forkert staff password");
 
-            HttpContext.Session.SetString("IsAdmin", "true"); // 👈 VIGTIG
+            HttpContext.Session.SetString("IsAdmin", "true"); // staff har admin-rettigheder
+            HttpContext.Session.SetString("IsStaff", "true");
             HttpContext.Session.SetString("Username", username);
 
-            return Ok(new { role = "admin" });
+            return Ok(new { role = "staff" }); // 👈 VIGTIG ÆNDRING
         }
 
         // =========================

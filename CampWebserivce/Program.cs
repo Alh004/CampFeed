@@ -1,45 +1,49 @@
 using CampLib.Repository;
 using CampLib.Repositorya;
-using Microsoft.EntityFrameworkCore;
-using KlasseLib;
-using WebApplication1;
 using CampWebservice.Configuration;
 using CampWebservice.Services;
-f
+using KlasseLib;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // DB
 builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")) // connection string
-);
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Repos
-builder.Services.AddScoped<CategoryRepository>(); // pr. request
-builder.Services.AddScoped<StaffRepository>(); // pr. request
+builder.Services.AddScoped<CategoryRepository>();
+builder.Services.AddScoped<StaffRepository>();
 
 // Cloudinary
-builder.Services.Configure<CloudinarySettings>(
-    builder.Configuration.GetSection("Cloudinary") // læs config
-);
-builder.Services.AddSingleton<CloudinaryService>(); // én instans
-
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
+builder.Services.AddSingleton<CloudinaryService>();
 
 builder.Services.AddScoped<CampWebservice.Services.IEmailService, CampWebservice.Services.EmailService>();
 
-
 // API + Swagger
-builder.Services.AddControllers();           // controllers
-builder.Services.AddEndpointsApiExplorer();  // swagger endpoints
-builder.Services.AddSwaggerGen();            // swagger docs
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// ⚡️ Session support
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.IdleTimeout = TimeSpan.FromHours(1);
+});
 
 // CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin() // alle origins (dev)
-            .AllowAnyMethod() // alle methods
-            .AllowAnyHeader();// alle headers
+        policy.WithOrigins("http://127.0.0.1:5503", "http://localhost:5503")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
@@ -48,14 +52,12 @@ var app = builder.Build();
 // Middleware
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();   // swagger json
-    app.UseSwaggerUI(); // swagger UI
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.UseCors("AllowAll"); // tillad frontend
-
-// app.UseHttpsRedirection(); // https redirect (valgfri)
-
-app.UseAuthorization();  // auth pipeline
-app.MapControllers();    // map routes
-app.Run();               // start app
+app.UseCors("AllowFrontend");
+app.UseSession();      // ⚡️ VIGTIG: session skal aktiveres
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
